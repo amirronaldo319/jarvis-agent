@@ -13,7 +13,7 @@ export default function SettingsPage() {
   function wipe() {
     if (!confirm("Delete all conversations, tasks, runs and settings stored in this browser?")) return;
     ["jv.settings", "jv.convs", "jv.tasks", "jv.runs", "jv.ui"].forEach((k) => localStorage.removeItem(k));
-    toast("Local data deleted."); setTimeout(() => window.location.replace("/"), 400);
+    toast("Local data deleted."); setTimeout(() => window.location.replace(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/`), 400);
   }
   return (
     <div className="page"><div className="page__inner">
