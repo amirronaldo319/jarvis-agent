@@ -30,8 +30,8 @@ export default function SettingsPage() {
         </Panel>
         <Panel title="Providers" code="MODEL REGISTRY">
           {!models ? <div className="skeleton" /> : models.map((m) => (
-            <div key={m.id} className="row"><div className="row__main">{m.label}<div className="mono muted" style={{ fontSize: 11 }}>{m.provider}</div></div>
-              <Badge status={m.status === "available" ? "nominal" : "offline"}>{m.status === "available" ? "Online" : m.status === "no-key" ? "No key" : "Pending"}</Badge></div>
+            <div key={m.id} className="row"><div className="row__main">{m.label}<div className="mono muted" style={{ fontSize: 11 }}>{m.provider}{m.hint ? ` · ${m.hint}` : ""}</div></div>
+              <Badge status={m.status === "available" ? "nominal" : m.status === "needs-config" ? "caution" : "offline"}>{m.status === "available" ? "Online" : m.status === "no-key" ? "No key" : "Set up"}</Badge></div>
           ))}
           <p className="muted mono" style={{ fontSize: 11, margin: "12px 0 0" }}>Keys live in server environment variables and never reach the browser.</p>
         </Panel>

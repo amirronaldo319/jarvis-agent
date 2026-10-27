@@ -35,7 +35,7 @@ export function Composer({ initial = "", onSent }: { initial?: string; onSent?: 
   useEffect(() => { ta.current?.focus(); }, []);
 
   const modelBlocked = selectedModel?.status !== "available";
-  const reason = modelBlocked ? "No connected model. Add ANTHROPIC_API_KEY to .env.local and restart." : "";
+  const reason = modelBlocked ? "No connected model. Add a provider key to .env.local (see .env.example) and restart." : "";
   const canSend = !!text.trim() && !live && !reason;
 
   function submit() {

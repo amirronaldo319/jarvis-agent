@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findAvailable, resolveModels } from "@/lib/models";
+import { resolveModels, resolveRuntime } from "@/lib/models";
 import { createLimiter } from "@/lib/rate-limit";
 import { filterTasks } from "@/lib/tasks";
 import type { Task } from "@/lib/types";
@@ -7,18 +7,27 @@ import type { Task } from "@/lib/types";
 const t = (id: string, o: Partial<Task>): Task => ({ id, title: id, priority: "med", done: false, createdAt: 0, ...o });
 
 describe("model registry", () => {
-  it("marks Anthropic models available only with a key", () => {
-    expect(resolveModels({}).find((m) => m.id === "claude-sonnet-5-5")?.status).toBe("no-key");
-    expect(resolveModels({ ANTHROPIC_API_KEY: "x" }).find((m) => m.id === "claude-sonnet-5-5")?.status).toBe("available");
+  const status = (env: Record<string, string>, id: string) => resolveModels(env).find((m) => m.id === id)?.status;
+  it("Anthropic models need only a key", () => {
+    expect(status({}, "claude-sonnet-5-5")).toBe("no-key");
+    expect(status({ ANTHROPIC_API_KEY: "x" }, "claude-sonnet-5-5")).toBe("available");
   });
-  it("never reports providers without an adapter as available", () => {
-    const env = { OPENAI_API_KEY: "x", GOOGLE_API_KEY: "x", XAI_API_KEY: "x", DEEPSEEK_API_KEY: "x" };
-    expect(resolveModels(env).filter((m) => m.provider !== "anthropic").every((m) => m.status === "adapter-pending")).toBe(true);
+  it("OpenAI-compatible providers need a key AND a model name", () => {
+    expect(status({}, "openai")).toBe("no-key");
+    expect(status({ OPENAI_API_KEY: "x" }, "openai")).toBe("needs-config");
+    expect(status({ OPENAI_API_KEY: "x", OPENAI_MODEL: "m" }, "openai")).toBe("available");
+    expect(resolveModels({ OPENAI_API_KEY: "x", OPENAI_MODEL: "m" }).find((m) => m.id === "openai")?.label).toBe("OpenAI · m");
   });
-  it("findAvailable rejects unknown or unconnected ids", () => {
-    expect(findAvailable("claude-sonnet-5-5", {})).toBeUndefined();
-    expect(findAvailable("nope", { ANTHROPIC_API_KEY: "x" })).toBeUndefined();
-    expect(findAvailable("claude-haiku-5-5", { ANTHROPIC_API_KEY: "x" })).toBeDefined();
+  it("custom endpoint needs base URL and model but not a key", () => {
+    expect(status({ OPENAI_COMPAT_MODEL: "llama" }, "custom")).toBe("needs-config");
+    expect(status({ OPENAI_COMPAT_MODEL: "llama", OPENAI_COMPAT_BASE_URL: "http://localhost:11434/v1" }, "custom")).toBe("available");
+  });
+  it("resolveRuntime returns details only for available models and never leaks via resolveModels", () => {
+    expect(resolveRuntime("openai", {})).toBeUndefined();
+    expect(resolveRuntime("nope", { ANTHROPIC_API_KEY: "x" })).toBeUndefined();
+    const rt = resolveRuntime("deepseek", { DEEPSEEK_API_KEY: "k", DEEPSEEK_MODEL: "m" });
+    expect(rt).toEqual({ kind: "openai-compat", baseUrl: "https://api.deepseek.com", apiKey: "k", model: "m" });
+    expect(JSON.stringify(resolveModels({ DEEPSEEK_API_KEY: "secret-k", DEEPSEEK_MODEL: "m" }))).not.toContain("secret-k");
   });
 });
 

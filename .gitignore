@@ -42,3 +42,6 @@ next-env.d.ts
 
 # agent runtime data
 .data/
+
+# keep the template tracked
+!.env.example

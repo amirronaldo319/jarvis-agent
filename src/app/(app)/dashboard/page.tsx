@@ -73,7 +73,7 @@ export default function Dashboard() {
         </Panel>
         <Panel title="Models" code={`${online.length} ONLINE`}>
           {!models ? <div className="skeleton" /> : online.length === 0 ?
-            <Empty title="No model connected">Add ANTHROPIC_API_KEY to .env.local, then restart the dev server.</Empty> :
+            <Empty title="No model connected">Add a provider key to .env.local (see .env.example), then restart the dev server.</Empty> :
             online.map((m) => <div key={m.id} className="row"><span className="row__main">{m.label}</span><Badge status="nominal" /></div>)}
         </Panel>
         <Panel title="Event log" code="LIVE">

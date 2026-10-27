@@ -8,7 +8,7 @@ import type { ModelInfo } from "@/lib/models";
 const STATUS: Record<ModelInfo["status"], { s: Status; w: string }> = {
   available: { s: "nominal", w: "Online" },
   "no-key": { s: "offline", w: "No key" },
-  "adapter-pending": { s: "offline", w: "Pending" },
+  "needs-config": { s: "caution", w: "Set up" },
 };
 
 export function ModelMenu({ up = false }: { up?: boolean }) {
@@ -44,7 +44,7 @@ export function ModelMenu({ up = false }: { up?: boolean }) {
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: "block" }}>{m.label}</span>
                   <span className="menu__meta">
-                    {m.provider}{m.capabilities.length ? ` · ${m.capabilities.join(", ")}` : ""}{m.note ? ` · ${m.note}` : ""}{m.status === "no-key" ? " · add key to .env.local" : ""}
+                    {m.provider}{m.status === "available" ? ` · ${m.capabilities.join(", ")}` : m.hint ? ` · ${m.hint} in .env.local` : ""}
                   </span>
                 </span>
                 <Badge status={st.s}>{st.w}</Badge>
