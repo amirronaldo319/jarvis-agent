@@ -9,6 +9,7 @@ import { Palette } from "./Palette";
 import { Panel } from "./ui";
 import { RunList } from "./RunList";
 import { useLocalStore } from "@/lib/store";
+import { ThemeSwitch } from "./ThemeSwitch";
 
 const ICON = { size: 18, strokeWidth: 1.5, strokeLinecap: "square" as const, "aria-hidden": true };
 
@@ -116,6 +117,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </button>
           <h1 className="topbar__title">{current?.label ?? "Jarvis"}</h1>
           <span className="topbar__spacer" />
+          <ThemeSwitch />
           <button className="btn btn--sm only-desktop" onClick={() => setPalette(true)} aria-label="Open command palette"><Command size={14} strokeWidth={1.5} /> K</button>
           <button className="icon-btn only-mobile" aria-label="Open command palette" onClick={() => setPalette(true)}><Command {...ICON} /></button>
           <button className="icon-btn only-desktop" aria-label="Toggle activity panel" aria-pressed={prefs.rail} onClick={() => setPrefs({ ...prefs, rail: !prefs.rail })}><PanelRight {...ICON} /></button>

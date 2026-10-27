@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Check, Trash2 } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
 import { Badge, Empty, Panel } from "@/components/ui";
+import { Button, Field, Tabs } from "@/components/hud";
 import { filterTasks, type TaskFilter } from "@/lib/tasks";
 import { useToday } from "@/lib/today";
 import { uid } from "@/lib/store";
@@ -37,27 +38,16 @@ export default function Tasks() {
       <h2 className="page-title">Tasks</h2>
       <Panel title="New task" code="LOCAL">
         <form className="form-row" onSubmit={add} noValidate>
-          <div className="field grow">
-            <label className="label" htmlFor="t-title">Title</label>
-            <input id="t-title" className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Review the quarterly plan" aria-invalid={!!err} aria-describedby={err ? "t-err" : undefined} />
-            {err && <span id="t-err" className="mono" style={{ color: "var(--critical)", fontSize: 11 }}>{err}</span>}
-          </div>
+          <div className="grow"><Field label="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Review the quarterly plan" error={err || undefined} /></div>
           <div className="field"><label className="label" htmlFor="t-due">Due</label><input id="t-due" type="date" className="input" value={due} onChange={(e) => setDue(e.target.value)} /></div>
           <div className="field"><label className="label" htmlFor="t-pri">Priority</label>
             <select id="t-pri" className="input" value={priority} onChange={(e) => setPriority(e.target.value as Priority)}><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select>
           </div>
-          <button className="btn btn--primary" type="submit">Add</button>
+          <Button variant="primary" type="submit">Add</Button>
         </form>
       </Panel>
       <div>
-        <div className="tabs" role="tablist" aria-label="Task filter">
-          {TABS.map((t) => (
-            <button key={t.id} role="tab" aria-selected={filter === t.id} onClick={() => setFilter(t.id)}
-              onKeyDown={(e) => { const i = TABS.findIndex((x) => x.id === filter); if (e.key === "ArrowRight") setFilter(TABS[(i + 1) % TABS.length].id); if (e.key === "ArrowLeft") setFilter(TABS[(i + TABS.length - 1) % TABS.length].id); }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <Tabs tabs={TABS} value={filter} onChange={setFilter} label="Task filter">
         <div style={{ margin: "16px 0" }}><input className="input" placeholder="Search tasks" aria-label="Search tasks" value={q} onChange={(e) => setQ(e.target.value)} /></div>
         {list.length === 0 ? <Empty title={tasks.length ? "No matching tasks" : "No tasks yet"}>{tasks.length ? "Try another filter or search." : "Add your first task above. Tasks are stored in this browser."}</Empty> :
           <div className="panel" style={{ padding: "0 16px" }}>
@@ -73,6 +63,7 @@ export default function Tasks() {
               </div>
             ))}
           </div>}
+        </Tabs>
       </div>
       <p className="muted mono" style={{ fontSize: 12 }}>Local tasks only. No external task provider is synchronized and no reminders are scheduled.</p>
     </div></div>

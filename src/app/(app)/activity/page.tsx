@@ -4,6 +4,8 @@ import { useApp } from "@/components/AppProvider";
 import { ApprovalCard, APPROVAL_WORD } from "@/components/ApprovalCard";
 import { Badge, Empty, Panel } from "@/components/ui";
 import { RunList } from "@/components/RunList";
+import { Terminal } from "@/components/hud";
+import { buildLog } from "@/lib/activity-log";
 
 export default function Activity() {
   const { runs, clearRuns, approvals, refreshApprovals } = useApp();
@@ -39,6 +41,9 @@ export default function Activity() {
             </details>
           );
         })}
+      </Panel>
+      <Panel title="Event log" code="NEWEST FIRST">
+        {runs.length + approvals.length === 0 ? <Empty title="No events yet" /> : <Terminal lines={buildLog(runs, approvals, 20)} label="Agent event log" />}
       </Panel>
       <Panel title="Run history" code={`${runs.length} RUNS`}><RunList /></Panel>
       <p className="muted mono" style={{ fontSize: 12 }}>Runs are stored in this browser and hold no prompt text. Tool proposals and results are stored on the server in .data/agent.json, including the exact input shown above.</p>
